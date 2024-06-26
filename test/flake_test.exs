@@ -57,21 +57,45 @@ defmodule FlakeTest do
     assert flake.worker_id == flake2.worker_id
   end
 
+  test "can't start Flake with more than 64 workers" do
+    refute Flake.start(1, 65) == :ok
+    refute Flake.start(1, -1) == :ok
+    refute Flake.start(1, :foo) == :ok
+  end
+
+  test "can't start Flake with invalid machine id" do
+    refute Flake.start(-1) == :ok
+    refute Flake.start(:foo) == :ok
+    refute Flake.start(256) == :ok
+  end
+
   test "can generate 1,000,000 ids within a couple of seconds" do
     workers = 20
-    work = :erlang.min(100_000, div(1_000_000, workers))
+    work = div(1_000_000, workers)
     Flake.start(1, workers)
 
-    {time, _} =
+    {time, ids} =
       :timer.tc(fn ->
         ts =
           for j <- 0..(workers - 1),
-              do: Task.async(fn -> for _i <- 0..work, do: Flake.get_id(j) end)
+              do:
+                Task.async(fn ->
+                  for _i <- 1..work do
+                    {:ok, id} = Flake.get_id(j)
+                    id
+                  end
+                end)
 
-        _ = for t <- ts, do: Task.await(t)
+        for t <- ts, do: Task.await(t)
       end)
 
+    total =
+      ids
+      |> List.flatten()
+      |> Enum.count()
+
     IO.puts("Took #{time / 1000 / 1000} seconds to generate #{work * workers} ids.")
+    assert total == 1_000_000
     assert time < :timer.seconds(3) * 1000
   end
 end

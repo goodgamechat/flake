@@ -1,8 +1,17 @@
 defmodule Flake do
   require Logger
 
-  def start(machine_id, workers \\ System.schedulers()) do
-    Flake.Manager.start(machine_id, :erlang.min(64, workers))
+  def start(machine_id, workers) when is_integer(workers) and workers > 0 and workers <= 64 do
+    Flake.Manager.start(machine_id, workers)
+  end
+
+  def start(_machine_id, _workers) do
+    Logger.error("The parameter 'workers' needs to be an integer between 1 and 64.")
+    {:error, :invalid_workers}
+  end
+
+  def start(machine_id) do
+    Flake.Manager.start(machine_id, :erlang.min(64, System.schedulers()))
   end
 
   def get_id(worker_id) do
