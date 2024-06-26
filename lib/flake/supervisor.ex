@@ -10,6 +10,7 @@ defmodule Flake.Supervisor do
       Flake.WorkerSupervisor,
       Flake.Manager
     ]
+
     Supervisor.init(children, strategy: :one_for_all)
   end
 end

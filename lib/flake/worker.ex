@@ -6,10 +6,10 @@ defmodule Flake.Worker do
 
   defmodule State do
     defstruct worker_id: nil,
-      machine_id: nil,
-      counter: 0,
-      total_calls: 0,
-      last_flake: 0
+              machine_id: nil,
+              counter: 0,
+              total_calls: 0,
+              last_flake: 0
   end
 
   def start_link(args) do
@@ -37,11 +37,13 @@ defmodule Flake.Worker do
     <<flake_id::64>> = <<time::34, state.machine_id::8, state.worker_id::6, state.counter::16>>
 
     if flake_id > state.last_flake do
-      new_state = %State{state |
-        counter: rem((state.counter + 1), @max_counter),
-        total_calls: state.total_calls + 1,
-        last_flake: flake_id
+      new_state = %State{
+        state
+        | counter: rem(state.counter + 1, @max_counter),
+          total_calls: state.total_calls + 1,
+          last_flake: flake_id
       }
+
       {:reply, {:ok, flake_id}, new_state}
     else
       {:reply, {:error, :potential_duplicate_id}, state}

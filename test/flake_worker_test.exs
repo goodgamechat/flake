@@ -10,8 +10,9 @@ defmodule FlakeWorkerTest do
     for _i <- 0..65_535 do
       {:ok, _flake} = Flake.Worker.get_id(context.pid)
     end
+
     :timer.sleep(:timer.seconds(1))
-    last_flake = Flake.Worker.get_id(context.pid) |> Flake.get_flake_components
+    last_flake = Flake.Worker.get_id(context.pid) |> Flake.get_flake_components()
     assert last_flake.counter == 0
   end
 end
