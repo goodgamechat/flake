@@ -1,5 +1,8 @@
 # Flake
 
+![CI]
+(https://github.com/goodgamechat/flake/actions/workflows/elixir.yml/badge.svg)
+
 **TODO: Add description**
 
 ## Installation
