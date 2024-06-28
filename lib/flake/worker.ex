@@ -1,10 +1,31 @@
+### ----------------------------------------------------------------------------
+###
+###  flake, Copyright (C) 2024  Michael Slezak
+###
+###  This program is free software: you can redistribute it and/or modify
+###  it under the terms of the GNU General Public License as published by
+###  the Free Software Foundation, either version 3 of the License, or
+###  (at your option) any later version.
+###
+###  This program is distributed in the hope that it will be useful,
+###  but WITHOUT ANY WARRANTY; without even the implied warranty of
+###  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+###  GNU General Public License for more details.
+###
+###  You should have received a copy of the GNU General Public License
+###  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+###
+### ----------------------------------------------------------------------------
+
 defmodule Flake.Worker do
   use GenServer, restart: :temporary
+  @moduledoc false
 
   @max_worker_id 64
   @max_counter 65_536
 
   defmodule State do
+    @moduledoc false
     defstruct worker_id: nil,
               machine_id: nil,
               counter: 0,
@@ -34,7 +55,9 @@ defmodule Flake.Worker do
 
   def handle_call(:get_id, _from, state) do
     time = :erlang.system_time(:seconds)
-    <<flake_id::64-unsigned-integer>> = <<time::34, state.machine_id::8, state.worker_id::6, state.counter::16>>
+
+    <<flake_id::64-unsigned-integer>> =
+      <<time::34, state.machine_id::8, state.worker_id::6, state.counter::16>>
 
     if flake_id > state.last_flake do
       new_state = %State{

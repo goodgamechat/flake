@@ -1,5 +1,6 @@
 defmodule FlakeTest do
   use ExUnit.Case, async: true
+  doctest Flake
 
   setup do
     Flake.Manager.reset()
@@ -11,6 +12,19 @@ defmodule FlakeTest do
     assert components.machine_id == 1
     assert components.worker_id == 1
     assert components.counter == 0
+  end
+
+  test "generate flake id edge cases" do
+    Flake.start(1, 64)
+    zero = Flake.get_id(0) |> Flake.get_flake_components()
+    first = Flake.get_id(1) |> Flake.get_flake_components()
+    last = Flake.get_id(63) |> Flake.get_flake_components()
+    invalid = Flake.get_id(64)
+
+    assert invalid == {:error, :invalid_worker_id}
+    assert zero.worker_id == 0
+    assert first.worker_id == 1
+    assert last.worker_id == 63
   end
 
   test "counter restart doesnt allow duplicate flake ids" do
