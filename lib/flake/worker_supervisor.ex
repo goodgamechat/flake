@@ -1,4 +1,4 @@
-###----------------------------------------------------------------------------
+### ----------------------------------------------------------------------------
 ###
 ###  flake, Copyright (C) 2024  Michael Slezak
 ###
@@ -15,7 +15,7 @@
 ###  You should have received a copy of the GNU General Public License
 ###  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###
-###----------------------------------------------------------------------------
+### ----------------------------------------------------------------------------
 
 defmodule Flake.WorkerSupervisor do
   use DynamicSupervisor

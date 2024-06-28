@@ -1,4 +1,4 @@
-###----------------------------------------------------------------------------
+### ----------------------------------------------------------------------------
 ###
 ###  flake, Copyright (C) 2024  Michael Slezak
 ###
@@ -15,12 +15,12 @@
 ###  You should have received a copy of the GNU General Public License
 ###  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###
-###----------------------------------------------------------------------------
+### ----------------------------------------------------------------------------
 
 defmodule Flake do
-  @type flake_id()   :: 0..18_446_744_073_709_551_615
+  @type flake_id() :: 0..18_446_744_073_709_551_615
   @type machine_id() :: 0..255
-  @type worker_id()  :: 0..63
+  @type worker_id() :: 0..63
 
   @moduledoc """
   Public-facing API for starting and generating flake ID's.
@@ -32,11 +32,12 @@ defmodule Flake do
 
   This *must* be called before generating a flake ID.
   """
-  @spec start(machine_id(), workers) :: :ok | {:error, error} when
-    workers: 1..64,
-    error: :machine_id
-         | :invalid_workers
-         | :already_started
+  @spec start(machine_id(), workers) :: :ok | {:error, error}
+        when workers: 1..64,
+             error:
+               :machine_id
+               | :invalid_workers
+               | :already_started
   def start(machine_id, workers) when is_integer(workers) and workers > 0 and workers <= 64 do
     Flake.Manager.start(machine_id, workers)
   end
@@ -54,9 +55,10 @@ defmodule Flake do
 
   This *must* be called before generating a flake ID.
   """
-  @spec start(machine_id()) :: :ok | {:error, error} when
-    error: :machine_id
-         | :already_started
+  @spec start(machine_id()) :: :ok | {:error, error}
+        when error:
+               :machine_id
+               | :already_started
   def start(machine_id) do
     Flake.Manager.start(machine_id, :erlang.min(64, System.schedulers()))
   end
@@ -70,9 +72,10 @@ defmodule Flake do
   For best performance, try to evenly distribute calls to flake worker processes from
   different calling processes.
   """
-  @spec get_id(worker_id()) :: {:ok, flake_id()} | {:error, error} when
-    error: :potential_duplicate_id
-         | :invalid_worker_id
+  @spec get_id(worker_id()) :: {:ok, flake_id()} | {:error, error}
+        when error:
+               :potential_duplicate_id
+               | :invalid_worker_id
   def get_id(worker_id) do
     case Flake.Manager.get_id(worker_id) do
       {:ok, _id} = flake ->
@@ -99,11 +102,13 @@ defmodule Flake do
   %{time: 1719599268, machine_id: 1, worker_id: 1, counter: 0}
   ```
   """
-  @spec get_flake_components({:ok, flake_id()} | flake_id()) :: results when
-    results: %{required(:time)       => 0..17_179_869_183,
+  @spec get_flake_components({:ok, flake_id()} | flake_id()) :: results
+        when results: %{
+               required(:time) => 0..17_179_869_183,
                required(:machine_id) => machine_id(),
-               required(:worker_id)  =>  worker_id(),
-               required(:counter)    => 0..65_535}
+               required(:worker_id) => worker_id(),
+               required(:counter) => 0..65_535
+             }
   def get_flake_components({:ok, flake}) do
     get_flake_components(flake)
   end
